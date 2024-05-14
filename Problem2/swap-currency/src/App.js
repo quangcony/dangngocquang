@@ -1,84 +1,115 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
+import Dropdown from "./components/Dropdown";
+// import { INCH } from "./assets/tokens";
 
 const App = () => {
-  const [amount, setAmount] = useState(0);
+  const [amount, setAmount] = useState(0.1);
+  const [amountRec, setAmountRec] = useState(0);
   const [tokens, setTokens] = useState([]);
+  const [data, setData] = useState([]);
+  const [inputToken, setInputToken] = useState(null);
+  const [outputToken, setOutputToken] = useState(null);
+  const [hasErr, setHasError] = useState(false);
 
   // Get tokens price
   useEffect(() => {
-    fetch('https://interview.switcheo.com/prices.json')
+    fetch("https://interview.switcheo.com/prices.json")
       .then((res) => {
         return res.json();
       })
       .then((data) => {
-        console.log(data);
         setTokens(data);
       });
   }, []);
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    alert(`The name you entered was: ${amount}`);
+  useEffect(() => {
+    if (tokens && tokens.length > 0) {
+      const uniqueTokens = tokens.filter((token, i, self) => self.findIndex((m) => m.currency === token.currency)=== i)
+      const newTokens = uniqueTokens.map((token, index) => ({
+        key: token.currency + index,
+        label: token.currency,
+        value: token.currency,
+        price: token.price,
+        image: token.currency + '.svg'
+      }));
+
+      setData(newTokens);
+    }
+  }, [tokens]);
+
+  const handleSelectInput = (option) => {
+    setInputToken(option);
   };
 
-  if(tokens && tokens.length <= 0) {
-    return <h1>Can't get tokens price infomation</h1>
+  const handleSelectOutput = (option) => {
+    setOutputToken(option);
+  };
+
+  const validateInput = (amount) => {
+    if (amount <= 0.0000001) {
+      setAmount(0)
+      setHasError(true)
+    } else {
+      setAmount(amount)
+      setHasError(false)
+    }
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    let exchange = ((inputToken?.price * amount) / outputToken?.price).toFixed(8)
+    setAmountRec(exchange)
+  };
+
+  if (data && data.length <= 0) {
+    return <h1>Can't get tokens price infomation</h1>;
   }
 
   return (
-    <div className="max-w-[620px] mx-auto mt-4">
+    <div className="max-w-[740px] mx-auto mt-4 p-4">
       <form
         onSubmit={handleSubmit}
         className="flex flex-col items-center gap-5 w-full bg-gray-400 rounded-3xl px-6 py-12"
       >
-        <h5 className="text-3xl font-black">Swap</h5>
-        <label className="text-lg">
+        <h2 className="text-3xl font-black">Swap</h2>
+        <label className="text-lg flex flex-row items-center mb-4">
           <span className="w-44 inline-block">Amount to send</span>
-          <input
-            className="ml-4 black pl-3 py-1 outline-none h-10"
-            type="number"
-            name="input-amount"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-          />
-          <select
-            id="input-tokens"
-            class="ml-0.5 h-10 text-white text-sm focus:ring-blue-500 p-2.5 bg-gray-700"
-          >
-            
-            {
-              tokens.map((token, i) => (
-                <option key={i} value={token.currency} selected = {token.currency === 'LUNA'}>{token.currency}</option>
-              ))
+          <div className="relative ml-4 black h-10 ">
+            <input
+              className="px-3 py-1 outline-none h-full text-right"
+              type="number"
+              name="input-amount"
+              step={0.1}
+              value={amount}
+              onChange={(e) => validateInput(e.target.value)}
+            />
+            {hasErr && 
+              <div className="w-full h-6 bg-red-200 text-[12px] text-red-600 flex justify-between items-center p-1">
+              <span>Min amount:</span>
+              <span>0.0000001</span>
+            </div>
             }
-
-          </select>
+            
+          </div>
+          <Dropdown options={data} onSelect={handleSelectInput} selected="ETH"/>
         </label>
-        <label className="text-lg">
-        <span className="w-44 inline-block">Amount to receive</span>
+
+        <label className="text-lg flex flex-row items-center">
+          <span className="w-44 inline-block">Amount to receive</span>
           <input
-            className="ml-4 pl-3 py-1 outline-none h-10"
+            className="ml-4 px-3 py-1 outline-none h-10 text-right"
             type="text"
             name="output-amount"
+            value={amountRec}
             readOnly
           />
-          <select
-            id="output-tokens"
-            class="ml-0.5 h-10 text-white text-sm focus:ring-blue-500 p-2.5 bg-gray-700"
-          >
-            {
-              tokens.map((token, i) => (
-                <option key={i} value={token.currency} selected = {token.currency === 'ETH'}>{token.currency}</option>
-              ))
-            }
-            
-          </select>
+          <Dropdown options={data} onSelect={handleSelectOutput} selected="USD"/>
         </label>
 
         <input
           type="submit"
-          className="border border-white rounded-3xl text-white text-sm bg-green-500 px-6 py-2"
+          className="border border-white rounded-3xl text-white text-sm bg-green-500 px-6 py-2 cursor-pointer"
           value="CONFIRM SWAP"
         />
       </form>
