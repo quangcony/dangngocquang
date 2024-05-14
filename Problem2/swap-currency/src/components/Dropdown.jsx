@@ -21,9 +21,7 @@ const Dropdown = ({ options, onSelect, selected }) => {
 
   return (
     <div>
-
- 
-    <div className="flex flex-row relative ml-1">
+    <div className="flex flex-row relative ml-1 z-10">
       <div
         className="bg-white h-10 flex items-center w-44 px-1"
         onClick={() => setIsOpen(!isOpen)}
@@ -58,7 +56,7 @@ const Dropdown = ({ options, onSelect, selected }) => {
         />
       </div>
       {isOpen && (
-        <div className="max-h-60 overflow-y-auto absolute top-[110%] left-0 bg-white p-4 w-60 z-10">
+        <div className="max-h-60 overflow-y-auto absolute top-[110%] left-0 bg-white p-4 w-60 z-11">
           <h3 class="text-sm font-light">All cryptocurrencies</h3>
           <ul>
             {options.map((option) => (
