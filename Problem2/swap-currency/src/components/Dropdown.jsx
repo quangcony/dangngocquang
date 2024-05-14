@@ -6,14 +6,12 @@ const Dropdown = ({ options, onSelect, selected }) => {
   const [selectedOption, setSelectedOption] = useState(null);
 
   useEffect(() => {
-
     if (options && options.length > 0) {
-        const selectedItem = options.find((option) => option.value === selected)
-        setSelectedOption(selectedItem)
-        onSelect(selectedItem)
+      const selectedItem = options.find((option) => option.value === selected);
+      setSelectedOption(selectedItem);
+      onSelect(selectedItem);
     }
-
-  }, [options, selected])
+  }, [options, selected]);
 
   const handleSelect = (option) => {
     setSelectedOption(option);
@@ -22,6 +20,9 @@ const Dropdown = ({ options, onSelect, selected }) => {
   };
 
   return (
+    <div>
+
+ 
     <div className="flex flex-row relative ml-1">
       <div
         className="bg-white h-10 flex items-center w-44 px-1"
@@ -38,8 +39,7 @@ const Dropdown = ({ options, onSelect, selected }) => {
             </div>
             <span className="flex-1">{selectedOption.label}</span>
           </>
-        )
-         : (
+        ) : (
           <>
             <div className="w-10 h-full border-r-2 mr-2 p-2">
               <img
@@ -59,25 +59,27 @@ const Dropdown = ({ options, onSelect, selected }) => {
       </div>
       {isOpen && (
         <div className="max-h-60 overflow-y-auto absolute top-[110%] left-0 bg-white p-4 w-60 z-10">
-            <h3 class="text-sm font-light">All cryptocurrencies</h3>
-        <ul >
-          {options.map((option) => (
-            <li
-              key={option.value}
-              onClick={() => handleSelect(option)}
-              className="flex gap-2 items-center mt-2"
-            >
-              <img
-                src={`./tokens/${option.image}`}
-                alt={option.label}
-                className="w-6 h-6 object-contain"
-              />
-              <span>{option.label}</span>
-            </li>
-          ))}
-        </ul>
+          <h3 class="text-sm font-light">All cryptocurrencies</h3>
+          <ul>
+            {options.map((option) => (
+              <li
+                key={option.value}
+                onClick={() => handleSelect(option)}
+                className="flex gap-2 items-center mt-2"
+              >
+                <img
+                  src={`./tokens/${option.image}`}
+                  alt={option.label}
+                  className="w-6 h-6 object-contain"
+                />
+                <span>{option.label}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
+    </div>
+    <div className="w-full h-screen bg-black/20 absolute left-0 top-0 z-9" onClick={() => console.log(isOpen)}></div>
     </div>
   );
 };
