@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { DropdownIcon } from "../assets/icons";
 
 const Dropdown = ({ options, onSelect, selected }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
+  let menuRef = useRef(null)
 
   useEffect(() => {
     if (options && options.length > 0) {
@@ -19,12 +20,29 @@ const Dropdown = ({ options, onSelect, selected }) => {
     setIsOpen(false);
   };
 
+  // Handler when user click outsite to close Dropdown menu
+  useEffect(() => {
+
+    let handler = (e) => {
+      if(!menuRef.current?.contains(e.target)) {
+        setIsOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handler)
+    return () => {
+      document.removeEventListener('mousedown', handler)
+    }
+  })
+  
+
   return (
     <div>
-    <div className="flex flex-row relative ml-1 z-10">
+    <div className="flex flex-row relative ml-1">
       <div
         className="bg-white h-10 flex items-center w-44 px-1"
         onClick={() => setIsOpen(!isOpen)}
+        
       >
         {selectedOption ? (
           <>
@@ -56,7 +74,7 @@ const Dropdown = ({ options, onSelect, selected }) => {
         />
       </div>
       {isOpen && (
-        <div className="max-h-60 overflow-y-auto absolute top-[110%] left-0 bg-white p-4 w-60 z-11">
+        <div ref={menuRef} className="max-h-60 overflow-y-auto absolute top-[110%] left-0 bg-white p-4 w-60 z-20">
           <h3 class="text-sm font-light">All cryptocurrencies</h3>
           <ul>
             {options.map((option) => (
@@ -77,7 +95,7 @@ const Dropdown = ({ options, onSelect, selected }) => {
         </div>
       )}
     </div>
-    <div className="w-full h-screen bg-black/20 absolute left-0 top-0 z-9" onClick={() => console.log(isOpen)}></div>
+    {/* <div className="w-full h-screen bg-black/20 absolute left-0 top-0 z-9" onClick={() => console.log(isOpen)}></div> */}
     </div>
   );
 };
